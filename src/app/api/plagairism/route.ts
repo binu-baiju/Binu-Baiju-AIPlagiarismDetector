@@ -6,12 +6,6 @@ import mammoth from "mammoth"; // For DOCX file handling
 import { NextRequest, NextResponse } from "next/server";
 import PDFParser from "pdf2json";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 // To parse the PDF
 
 export async function POST(req: NextRequest) {

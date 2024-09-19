@@ -44,7 +44,16 @@ export async function POST(req: NextRequest) {
       // // Convert the uploaded file into a Buffer
 
       // // Save the buffer as a temporary PDF file
-      await fs.writeFile(tempFilePath, fileBuffer);
+
+      try {
+        await fs.writeFile(tempFilePath, fileBuffer);
+        console.log("File written successfully");
+      } catch (error) {
+        console.error("Error writing file:", error);
+        // Handle the error appropriately, e.g., send an error response or retry
+      }
+
+      // await fs.writeFile(tempFilePath, fileBuffer);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const pdfParser = new (PDFParser as any)(null, 1);
 

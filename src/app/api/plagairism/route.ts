@@ -10,8 +10,7 @@ import OpenAI from "openai";
 // To parse the PDF
 const openai = new OpenAI({
   // apiKey: process.env.OPENAI_API_KEY,
-  apiKey:
-    "sk-Hrx0fkWsa6tyFRqYZsAh6w9lkt_a8KUQ2b5a0SoxpZT3BlbkFJknyN6sUleNI3V5PCGIHzMaSumrEVzUkuseerfpDFoA",
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
 });
 
 export async function POST(req: NextRequest) {

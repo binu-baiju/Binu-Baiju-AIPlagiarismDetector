@@ -5,8 +5,14 @@ import path from "path";
 import mammoth from "mammoth"; // For DOCX file handling
 import { NextRequest, NextResponse } from "next/server";
 import PDFParser from "pdf2json";
+import OpenAI from "openai";
 
 // To parse the PDF
+const openai = new OpenAI({
+  // apiKey: process.env.OPENAI_API_KEY,
+  apiKey:
+    "sk-Hrx0fkWsa6tyFRqYZsAh6w9lkt_a8KUQ2b5a0SoxpZT3BlbkFJknyN6sUleNI3V5PCGIHzMaSumrEVzUkuseerfpDFoA",
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -60,33 +66,23 @@ export async function POST(req: NextRequest) {
         pdfParser.loadPDF(tempFilePath);
       });
 
-      const extractedText = await parsedPDF;
+      parsedText = await parsedPDF;
       await fs.unlink(tempFilePath);
       // // Parse the PDF file content using pdf-parse
       // const pdfData = await pdfParse(fileBuffer);
       // const extractedText = pdfData.text;
-      console.log(extractedText);
-
-      // Return the extracted text in the response
-      return new NextResponse(JSON.stringify({ extractedText }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      console.log(parsedText);
     } else if (fileExtension === ".docx") {
       console.log("sry");
       const docxResult = await mammoth.extractRawText({ buffer: fileBuffer });
 
-      let extractedText = docxResult.value;
+      const extractedText = docxResult.value;
 
-      extractedText = extractedText
+      parsedText = extractedText
         .replace(/\s+/g, " ") // Replace multiple spaces/newlines with a single space
         .replace(/^\s+|\s+$/g, "");
 
       console.log("extracted text:", extractedText);
-      return new NextResponse(JSON.stringify({ extractedText }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
     } else {
       return new NextResponse(
         JSON.stringify({ error: "Unsupported file type" }),
@@ -95,6 +91,50 @@ export async function POST(req: NextRequest) {
         }
       );
     }
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: [
+            {
+              type: "text",
+              text: 'you will be provided with a content.check it is it plagiarised or not.If it is plagiarised,Gave the percentage of plagiarized content with a title:"Plagiarised Percentage" and sections of the document that were flagged as plagiarized with a title "**Flagged Contents:**".Answer should be in the format of first give plagiarised percentage,then gave the section of plagiarised separated by numbers and points should be in one line.Just gave that nothing more.',
+            },
+          ],
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: parsedText,
+            },
+          ],
+        },
+      ],
+      temperature: 1,
+      max_tokens: 2048,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0,
+      response_format: {
+        type: "text",
+      },
+    });
+
+    // const responseText = JSON.stringify(response.choices[0].message.content);
+    const responseText = response.choices[0].message.content;
+    // console.log("response text from openai", JSON.stringify(responseText));
+
+    const result = responseText
+      ? parsePlagiarismResponse(responseText)
+      : { percentage: 0, flaggedSection: [] };
+    console.log("Response:", result);
+    return new NextResponse(JSON.stringify(result), {
+      status: 200,
+    });
   } catch (error) {
     console.error("Error processing file:", error);
     return new NextResponse(
@@ -104,4 +144,40 @@ export async function POST(req: NextRequest) {
       }
     );
   }
+}
+
+function parsePlagiarismResponse(text: string) {
+  // Assuming the response format is consistent, you might need to adjust parsing logic
+  console.log("raw response Text:", text);
+
+  const [percentageSection, flaggedSection] = text.split(
+    "**Flagged Contents:**"
+  );
+  const percentage = parseFloat(percentageSection.replace(/[^0-9.]/g, ""));
+
+  // console.log("precentage and flagged Contents:", percentage);
+  console.log("percenteage:,", percentage);
+  const cleanedFlaggedContent = flaggedSection
+    // .replace(/^\s+|\s+$/g, "") // Trim leading and trailing whitespace
+    // .replace(/----------------Page \(\d+\) Break----------------/g, "") // Remove page breaks
+    // .split(/\d+\.\s+/); // Split by numbers and dots (e.g., 1. , 2. , etc.)
+    .replace(/^\s+|\s+$/g, "") // Trim leading and trailing whitespace
+    .replace(/```/g, "") // Remove code block delimiters
+    .replace(/----------------Page \(\d+\) Break----------------/g, "") // Remove page breaks
+    .replace(/\n+/g, " ") // Replace multiple newlines with a single space
+    .split(/\d+\.\s+/) // Split by numbers and dots (e.g., 1. , 2. , etc.)
+    .filter((section) => section.trim().length > 0) // Filter out empty sections
+    .map((section) => section.trim()); // Trim each section
+  console.log("flagged Contents:", cleanedFlaggedContent);
+  console.log("helo");
+  return {
+    percentage,
+    flaggedSection: cleanedFlaggedContent,
+  };
+  // return {
+  //   percentage,
+  //   flaggedSections: flaggedSection
+  //     .map((section) => section.trim())
+  //     .filter((section) => section.length > 0),
+  // };
 }

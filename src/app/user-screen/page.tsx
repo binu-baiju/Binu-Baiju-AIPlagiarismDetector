@@ -1,9 +1,12 @@
 "use client";
 
+import axios from "axios";
+
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ArrowDownToLine, FileText, Upload, X } from "lucide-react";
 import { useState, useRef } from "react";
+import { useFetch } from "@/hooks/useFetch";
 
 export default function UserScreen() {
   const [file, setFile] = useState<File | null>(null);
@@ -13,6 +16,8 @@ export default function UserScreen() {
     flaggedSections: string[];
   } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const apiUrl = useFetch();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -48,21 +53,35 @@ export default function UserScreen() {
       //   body: formData,
       // });
 
-      const response = await fetch("http://localhost:3000/api/plagairism", {
-        method: "POST",
-        body: formData,
+      // const response = await fetch("http://localhost:3000/api/plagairism", {
+      //   method: "POST",
+      //   body: formData,
+      // });
+
+      // if (!response.ok) {
+      //   throw new Error("Failed to analyze the document.");
+      // }
+
+      // const data = await response.json();
+      // console.log("Analysis result:", data);
+
+      // setResults({
+      //   percentage: data.percentage,
+      //   flaggedSections: data.flaggedSection,
+      // });
+
+      const response = await axios.post(apiUrl, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Required for sending form data
+        },
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to analyze the document.");
-      }
-
-      const data = await response.json();
+      const data = response.data; // Axios automatically parses the response as JSON
       console.log("Analysis result:", data);
 
       setResults({
         percentage: data.percentage,
-        flaggedSections: data.flaggedSections,
+        flaggedSections: data.flaggedSection,
       });
     } catch (error) {
       console.error("Error analyzing document:", error);

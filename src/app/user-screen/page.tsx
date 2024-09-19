@@ -74,7 +74,7 @@ export default function UserScreen() {
         headers: {
           "Content-Type": "multipart/form-data", // Required for sending form data
         },
-        timeout: 10000,
+        timeout: 20000,
       });
 
       const data = response.data; // Axios automatically parses the response as JSON

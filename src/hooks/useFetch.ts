@@ -6,7 +6,6 @@ export function useFetch() {
 
   useEffect(() => {
     // Check if the app is running in development or production
-    const isDevelopment = process.env.NODE_ENV === "development";
 
     setApiUrl(
       "https://binu-baiju-ai-plagiarism-detector.vercel.app/api/plagairism"

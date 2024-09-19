@@ -1,3 +1,4 @@
+export const maxDuration = 30;
 import { promises as fs } from "fs"; // To save the file temporarily
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
@@ -101,7 +102,7 @@ export async function POST(req: NextRequest) {
     }
 
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo-0125",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",

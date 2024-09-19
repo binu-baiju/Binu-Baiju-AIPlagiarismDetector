@@ -33,16 +33,42 @@ export default function UserScreen() {
     }
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
+    if (!file) {
+      console.error("No file selected");
+      return;
+    }
     setIsAnalyzing(true);
-    // Simulating API call to AI service
-    setTimeout(() => {
-      setResults({
-        percentage: 15,
-        flaggedSections: ["Introduction", "Methodology"],
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      // const response = await fetch("http://localhost:5000/api/analze", {
+      //   method: "POST",
+      //   body: formData,
+      // });
+
+      const response = await fetch("http://localhost:3000/api/plagairism", {
+        method: "POST",
+        body: formData,
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze the document.");
+      }
+
+      const data = await response.json();
+      console.log("Analysis result:", data);
+
+      setResults({
+        percentage: data.percentage,
+        flaggedSections: data.flaggedSections,
+      });
+    } catch (error) {
+      console.error("Error analyzing document:", error);
+    } finally {
       setIsAnalyzing(false);
-    }, 3000);
+    }
   };
 
   const handleRemoveFile = () => {

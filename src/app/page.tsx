@@ -1,36 +1,12 @@
 import { Button } from "@/components/ui/button";
+import Header from "@/components/ui/header";
 import { ArrowRight, CheckCircle, FileText, Zap } from "lucide-react";
 import Link from "next/link";
 
 export default function Homepage() {
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
-      <header className="px-4 lg:px-6 h-16 flex items-center border-b border-gray-800">
-        <Link className="flex items-center justify-center" href="#">
-          <FileText className="h-6 w-6 text-emerald-400" />
-          <span className="ml-2 text-lg font-bold">PlagiarismAI</span>
-        </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link
-            className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
-            href="#"
-          >
-            Features
-          </Link>
-          <Link
-            className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
-            href="#"
-          >
-            Pricing
-          </Link>
-          <Link
-            className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
-            href="#"
-          >
-            Contact
-          </Link>
-        </nav>
-      </header>
+      <Header />
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
           <div className="container px-4 md:px-6">
@@ -55,7 +31,10 @@ export default function Homepage() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-900">
+        <section
+          id="key-features"
+          className="w-full py-12 md:py-24 lg:py-32 bg-gray-900"
+        >
           <div className="container px-4 md:px-6">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-center mb-8">
               Key Features

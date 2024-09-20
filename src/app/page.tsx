@@ -45,10 +45,12 @@ export default function Homepage() {
                 </p>
               </div>
               <div className="space-x-4">
-                <Button className="inline-flex h-10 items-center justify-center rounded-md bg-emerald-600 px-8 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-700">
-                  Start Analyzing
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <Link href={`/user-screen`}>
+                  <Button className="inline-flex h-10 items-center justify-center rounded-md bg-emerald-600 px-8 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-700">
+                    Check For Plaigarism
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

@@ -6,7 +6,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
    ```bash
    git clone https://github.com/binu-baiju/Binu-Baiju-AIPlagiarismDetector.git
-   cd ai_plagiarism_detector
+   cd Binu-Baiju-AIPlagiarismDetector
    ```
 
 2. Install the dependencies:
